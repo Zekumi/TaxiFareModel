@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 
 def haversine_vectorized(df,
                          start_lat="pickup_latitude",
@@ -25,6 +25,14 @@ def haversine_vectorized(df,
     c = 2 * np.arcsin(np.sqrt(a))
     return 6371 * c
 
+def extract_time_features(df, timezone_name='America/New_York', time_column='pickup_datetime'):
+    df.index = pd.to_datetime(df[time_column])
+    df.index = df.index.tz_convert(timezone_name)
+    df["dow"] = df.index.weekday
+    df["hour"] = df.index.hour
+    df["month"] = df.index.month
+    df["year"] = df.index.year
+    return df.reset_index(drop=True)
 
 def compute_rmse(y_pred, y_true):
     return np.sqrt(((y_pred - y_true) ** 2).mean())
